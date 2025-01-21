@@ -122,20 +122,23 @@ public class MemorySpace {
 	 * Normally, called by malloc, when it fails to find a memory block of the requested size.
 	 * In this implementation Malloc does not call defrag.
 	 */
-	public void defrag() {
+
+		public void defrag() {
 		/// TODO: Implement defrag test
 		//// Write your code here
-		Node pointer = freeList.getFirst();
-		while (pointer != null) {
-			Node pointer2 = pointer;
-			while (pointer2 != null) {
-				if (pointer.block.baseAddress + pointer.block.length == pointer2.block.baseAddress) {
-					pointer.block.length += pointer2.block.length;
-					freeList.remove(pointer2);
-				}			
-				pointer2 = pointer2.next;
+			Node pointer = freeList.getFirst(); 
+			while (pointer != null) {
+				Node nextPointer = pointer.next;
+				while (nextPointer != null) {
+					if (pointer.block.baseAddress + pointer.block.length == nextPointer.block.baseAddress) {
+						pointer.block.length += nextPointer.block.length;
+						freeList.remove(nextPointer);
+						nextPointer = pointer.next;
+					} else {
+						nextPointer = nextPointer.next;
+					}
+				}
+				pointer = pointer.next;
 			}
-			pointer = pointer.next;
 		}
-	}
 }

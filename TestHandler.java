@@ -2871,7 +2871,6 @@ public class TestHandler {
             memorySpace.free(address1);
             memorySpace.defrag();
             actual += (actualB && memorySpace.toString().equals(expected3));
-            memorySpace.toString();
         } catch (Exception e) {
             actual = TesterMessagesEnum.ERROR + e.getMessage();
         }
