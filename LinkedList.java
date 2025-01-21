@@ -54,8 +54,19 @@ public class LinkedList {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
 		}
-		//// Replace the following statement with your code
-		return null;
+		if (size == 0) {
+			return null;
+		}
+		if (index == 0) {
+			return first;
+		}
+		else{
+			Node pointer = this.first;
+			for(int i = 0;i < index;i++){///לא יחרוג כי indez <= size
+				pointer = pointer.next;
+			}
+			return pointer;
+		}
 	}
 	
 	/**
@@ -78,7 +89,23 @@ public class LinkedList {
 	 *         if index is negative or greater than the list's size
 	 */
 	public void add(int index, MemoryBlock block) {
-		//// Write your code here
+		if (index < 0 || index > size) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
+		}
+		Node newNode = new Node(block);
+		if (index == 0) {
+			addFirst(block);
+		}
+		else if (index == size) {
+			addLast(block);
+		}
+		else if (index > 0 && index < size) {
+			Node pointer = getNode(index - 1);
+			newNode.next = pointer.next;
+			pointer.next = newNode;
+			size++;
+		}
 	}
 
 	/**
@@ -89,7 +116,15 @@ public class LinkedList {
 	 *        the given memory block
 	 */
 	public void addLast(MemoryBlock block) {
-		//// Write your code here
+		Node newNode = new Node(block); // Create a new node
+        if (size == 0) {
+            first = newNode;
+            last = newNode;
+        } else {
+            last.next = newNode;
+            last = newNode;
+        }
+        size++; 
 	}
 	
 	/**
@@ -100,7 +135,15 @@ public class LinkedList {
 	 *        the given memory block
 	 */
 	public void addFirst(MemoryBlock block) {
-		//// Write your code here
+		Node newNode = new Node(block); // Create a new node
+        if (size == 0) {
+            first = newNode;
+            last = newNode;
+        } else {
+            newNode.next = first;
+            first = newNode;
+        }
+        size++; 
 	}
 
 	/**
@@ -113,8 +156,11 @@ public class LinkedList {
 	 *         if index is negative or greater than or equal to size
 	 */
 	public MemoryBlock getBlock(int index) {
-		//// Replace the following statement with your code
-		return null;
+		if (size == 0) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
+		}
+		return getNode(index).block;
 	}	
 
 	/**
@@ -125,7 +171,13 @@ public class LinkedList {
 	 * @return the index of the block, or -1 if the block is not in this list
 	 */
 	public int indexOf(MemoryBlock block) {
-		//// Replace the following statement with your code
+		Node pointer = this.first;
+		for(int i = 0;i < this.size;i++){
+			if (pointer.block == block) {
+				return i;
+			}
+			pointer = pointer.next;
+		}
 		return -1;
 	}
 
@@ -136,8 +188,35 @@ public class LinkedList {
 	 *        the node that will be removed from this list
 	 */
 	public void remove(Node node) {
-		//// Write your code here
-	}
+
+        if (node == first) {
+            // Remove the first node
+            first = first.next;
+            if (first == null) {
+                last = null; // List becomes empty
+            }
+            size--;
+            return;
+        }
+
+        // Traverse the list to find the node
+        Node current = first;
+        while (current != null && current.next != node) {
+            current = current.next;
+        }
+
+        if (current == null || current.next == null) {
+            throw new IllegalArgumentException("Node not found in the list");
+        }
+        // Remove the node
+        current.next = node.next;
+        if (node == last) {
+            // If the node is the last node, update the last pointer
+            last = current;
+        }
+
+        size--;
+    }
 
 	/**
 	 * Removes from this list the node which is located at the given index.
@@ -146,9 +225,38 @@ public class LinkedList {
 	 * @throws IllegalArgumentException
 	 *         if index is negative or greater than or equal to size
 	 */
-	public void remove(int index) {
-		//// Write your code here
-	}
+		public void remove(int index) {
+
+			if (size == 0) {
+				throw new IllegalArgumentException(
+						"index must be between 0 and size");
+			}
+			else if (index < 0 || index >= size) {
+				throw new IllegalArgumentException("Index out of bounds: " + index);
+			}
+
+			else if (index == 0) {
+				remove(first);
+				return;
+			}
+			else if (index == size - 1) {
+				Node prev = getNode(index - 1);
+				prev.next = null;  // Disconnect the last node
+				last = prev;       // Update the last pointer
+				size--;
+				return;
+			}
+			else{
+				Node prev = getNode(index - 1);
+				if (prev.next == null) {
+					last = prev;
+				}
+				else{
+				remove(prev.next);
+				}
+			}
+		}
+		
 
 	/**
 	 * Removes from this list the node pointing to the given memory block.
@@ -158,7 +266,21 @@ public class LinkedList {
 	 *         if the given memory block is not in this list
 	 */
 	public void remove(MemoryBlock block) {
-		//// Write your code here
+		if (size == 0) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
+		}
+		if (first.block.equals(block)) {
+			remove(first);
+		}
+		else if(last.block.equals(block)){
+			remove(last);
+		}
+		else{
+			Node pointer = getNode(indexOf(block) - 1);
+			remove(pointer.next);
+		}
+
 	}	
 
 	/**
@@ -171,8 +293,27 @@ public class LinkedList {
 	/**
 	 * A textual representation of this list, for debugging.
 	 */
+	/*
 	public String toString() {
-		//// Replace the following statement with your code
-		return "";
+		String str = "";
+		if (this.getFirst() != null) {
+			Node pointer = this.getFirst();
+			while (pointer.next != null) {
+				str += pointer.block.toString()+"\n";
+				pointer = pointer.next;
+			}
+		}
+		return str;
+	}*/
+	public String toString() {
+		String str = "";
+		if (this.getFirst() != null) {
+			Node pointer = this.getFirst();
+			while (pointer != null) { // Ensure the loop handles the last node correctly
+				str += pointer.block.toString() + " "; // Add the current block
+				pointer = pointer.next; // Move to the next node
+			}
+		}
+		return str; // Trim to remove the trailing newline
 	}
 }

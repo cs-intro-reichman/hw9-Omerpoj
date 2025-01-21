@@ -57,8 +57,29 @@ public class MemorySpace {
 	 *        the length (in words) of the memory block that has to be allocated
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
-	public int malloc(int length) {		
-		//// Replace the following statement with your code
+	public int malloc(int length) {
+		if (length <= 0) {
+			return -1; 
+		}
+		Node pointer = freeList.getFirst(); 
+		while (pointer != null) {
+			if (pointer.block.length >= length) {
+				MemoryBlock allocatedBlock = new MemoryBlock(pointer.block.baseAddress, length);
+				allocatedList.addLast(allocatedBlock);
+				if (pointer.block.length == length) {
+					Node temp = pointer;
+					pointer = pointer.next;
+					freeList.remove(temp);
+				} else {
+					pointer.block.baseAddress += length;
+					pointer.block.length -= length;
+				}
+				return allocatedBlock.baseAddress;
+			}
+
+			pointer = pointer.next;
+		}
+
 		return -1;
 	}
 
@@ -71,7 +92,21 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		//// Write your code here
+		if (allocatedList.getSize() == 0) {
+			throw new IllegalArgumentException(
+				"index must be between 0 and size");
+		}
+		Node pointer = allocatedList.getFirst();
+		while (pointer != null) {
+			if (pointer.block.baseAddress == address) {
+				MemoryBlock temp = pointer.block;
+				pointer = pointer.next;
+				allocatedList.remove(temp);
+				freeList.addLast(temp);
+				return;
+			}
+			pointer = pointer.next;
+		}
 	}
 	
 	/**
@@ -90,5 +125,17 @@ public class MemorySpace {
 	public void defrag() {
 		/// TODO: Implement defrag test
 		//// Write your code here
+		Node pointer = freeList.getFirst();
+		while (pointer != null) {
+			Node pointer2 = pointer;
+			while (pointer2 != null) {
+				if (pointer.block.baseAddress + pointer.block.length == pointer2.block.baseAddress) {
+					pointer.block.length += pointer2.block.length;
+					freeList.remove(pointer2);
+				}			
+				pointer2 = pointer2.next;
+			}
+			pointer = pointer.next;
+		}
 	}
 }

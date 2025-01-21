@@ -2112,6 +2112,7 @@ public class TestHandler {
         String expected = "true";
         String actual = "";
         boolean actualB = true;
+
         try {
             actualB = (actualB && list.getSize() == 1 && list.getFirst().block.equals(block) && list.getLast().block.equals(block));
             list.remove(list.getNode(list.getSize() - 1).block);
@@ -2870,6 +2871,7 @@ public class TestHandler {
             memorySpace.free(address1);
             memorySpace.defrag();
             actual += (actualB && memorySpace.toString().equals(expected3));
+            memorySpace.toString();
         } catch (Exception e) {
             actual = TesterMessagesEnum.ERROR + e.getMessage();
         }
